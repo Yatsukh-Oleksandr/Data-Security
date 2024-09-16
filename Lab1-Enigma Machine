@@ -1,0 +1,74 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+
+void caesarShift(char* message, int start_shift) {
+int length = strlen(message);
+for (int i = 0; i < length; i++) {
+int shift = start_shift + i;
+message[i] = ((message[i] - 'A' + shift) % 26 + 26) % 26 + 'A'; 
+}
+}
+
+
+void reverseCaesarShift(char* message, int start_shift) {
+int length = strlen(message);
+for (int i = 0; i < length; i++) {
+int shift = start_shift + i;
+message[i] = ((message[i] - 'A' - shift + 26) % 26 + 26) % 26 + 'A';
+}
+}
+
+
+void Rotor(char* message, const char* rotor) {
+int length = strlen(message);
+for (int i = 0; i < length; i++) {
+message[i] = rotor[message[i] - 'A'];
+}
+}
+
+void reverseRotor(char* message, const char* rotor) {
+int length = strlen(message);
+for (int i = 0; i < length; i++) {
+for (int j = 0; j < 26; j++) {
+if (rotor[j] == message[i]) {
+message[i] = 'A' + j;
+break;
+}
+}
+}
+}
+
+int main() {
+char operation[8];
+scanf("%s", operation);
+
+int starting_numbers;
+scanf("%d", &starting_numbers);
+
+char rotorI[28], rotorII[28], rotorIII[28];
+scanf("%s", rotorI);
+scanf("%s", rotorII);
+scanf("%s", rotorIII);
+
+char message[1025];
+scanf("%s", message);
+
+if (strcmp(operation, "ENCODE") == 0) {
+caesarShift(message, starting_numbers);
+Rotor(message, rotorI);
+Rotor(message, rotorII);
+Rotor(message, rotorIII);
+
+printf("%s\n", message);
+} else if (strcmp(operation, "DECODE") == 0) {
+reverseRotor(message, rotorIII);
+reverseRotor(message, rotorII);
+reverseRotor(message, rotorI);
+reverseCaesarShift(message, starting_numbers);
+printf("%s\n", message);
+}
+
+return 0;
+}
