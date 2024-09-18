@@ -1,0 +1,52 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+#define MAX_LEN 1000
+
+void calculate_frequencies(const char *message, int letter_counts[]) {
+    for (int i = 0; message[i]; i++) {
+        if (isalpha(message[i])) {
+            letter_counts[toupper(message[i]) - 'A']++;
+        }
+    }
+}
+
+int find_most_frequent_letter(int letter_counts[]) {
+    int max_idx = 0;
+    for (int i = 1; i < 26; i++) {
+        if (letter_counts[i] > letter_counts[max_idx]) {
+            max_idx = i;
+        }
+    }
+    return max_idx;
+}
+
+void decode_message(const char *encoded, char *decoded, int shift) {
+    for (int i = 0; encoded[i]; i++) {
+        if (isalpha(encoded[i])) {
+            char base = islower(encoded[i]) ? 'a' : 'A';
+            decoded[i] = (encoded[i] - base - shift + 26) % 26 + base;
+        } else {
+            decoded[i] = encoded[i];  
+        }
+    }
+    decoded[strlen(encoded)] = '\0'; 
+}
+
+int main() {
+    char message[MAX_LEN + 1];
+    scanf("%[^\n]", message);
+    int letter_counts[26] = {0};
+    calculate_frequencies(message, letter_counts);
+
+    int most_frequent_idx = find_most_frequent_letter(letter_counts);
+    int estimated_shift = (most_frequent_idx - ('E' - 'A') + 26) % 26;
+
+    char decoded[MAX_LEN + 1];
+    decode_message(message, decoded, estimated_shift);
+
+    printf("%s\n", decoded);
+    return 0;
+}
