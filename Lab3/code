@@ -1,0 +1,39 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+void hex_to_bytes(const char* hex_str, unsigned char* bytes, int len) {
+    for (int i = 0; i < len; i += 2) {
+        sscanf(hex_str + i, "%2hhx", &bytes[i / 2]);
+    }
+}
+
+void xor_bytes(unsigned char* result, const unsigned char* a, const unsigned char* b, int len) {
+    for (int i = 0; i < len; i++) {
+        result[i] = a[i] ^ b[i];
+    }
+}
+
+int main() {
+    char message1_hex[501], message2_hex[501], message3_hex[501];
+    scanf("%s", message1_hex);
+    scanf("%s", message2_hex);
+    scanf("%s", message3_hex);
+
+    int len = strlen(message1_hex);
+    int byte_len = len / 2;
+    unsigned char message1[byte_len], message2[byte_len], message3[byte_len], message_xor[byte_len], clear_message[byte_len];
+
+    hex_to_bytes(message1_hex, message1, len);
+    hex_to_bytes(message2_hex, message2, len);
+    hex_to_bytes(message3_hex, message3, len);
+    xor_bytes(message_xor, message1, message3, byte_len);
+    xor_bytes(clear_message, message2, message_xor, byte_len);
+
+    for (int i = 0; i < byte_len; i++) {
+        printf("%c", clear_message[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
