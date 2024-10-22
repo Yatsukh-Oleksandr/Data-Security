@@ -1,0 +1,48 @@
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+
+char *char_to_binary(char c) {
+    char *binary = calloc(9, sizeof(char)); 
+    for (int i = 7; i >= 0; --i) {
+        binary[7 - i] = (c & (1 << i)) ? '1' : '0';
+    }
+    return binary;
+}
+
+char *encode(const char *text) {
+    size_t len = strlen(text);
+    char *encoded = calloc(len * 24 + 1, sizeof(char));
+    char *binary;
+    for (size_t i = 0; i < len; ++i) {
+        binary = char_to_binary(text[i]);
+        for (int j = 0; j < 8; ++j) {
+            // Tripling each bit
+            char bit = binary[j];
+            for (int k = 0; k < 3; ++k) {
+                strncat(encoded, &bit, 1);
+            }
+        }
+        free(binary);
+    }
+    return encoded;
+}
+
+char majority(char a, char b, char c) {
+    return (a == b) ? a : c;
+}
+
+char *decode(const char *bits) {
+    size_t len = strlen(bits);
+    char *decoded = calloc(len / 24 + 1, sizeof(char)); 
+    char byte[9]; 
+    for (size_t i = 0; i < len / 24; ++i) {
+        for (int j = 0; j < 8; ++j) {
+            char majority_bit = majority(bits[i * 24 + j * 3], bits[i * 24 + j * 3 + 1], bits[i * 24 + j * 3 + 2]);
+            byte[j] = majority_bit;
+        }
+        byte[8] = '\0';
+        decoded[i] = (char) strtol(byte, NULL, 2);
+    }
+    return decoded;
+}
