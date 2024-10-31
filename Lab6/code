@@ -1,0 +1,46 @@
+const char *scanner(int q[21][21]) {
+    static char result[10]; 
+    int tempValue = 0;      
+    int currentX = 20, currentY = 19, index = 0; 
+    int counter = 1;        
+    int toggle = 1;         
+
+
+    while (--currentY > 8) {
+        tempValue |= !toggle ^ q[currentY][currentX - 1] | (toggle ^ q[currentY][currentX]) * 2;
+        if (counter++ % 4 == 0) {
+            result[index++] = tempValue;
+        }
+        tempValue <<= 2;
+        toggle ^= 1;
+    }
+
+    toggle ^= 1;
+    currentX -= 2;
+
+
+    while (++currentY < 21) {
+        tempValue |= !toggle ^ q[currentY][currentX - 1] | (toggle ^ q[currentY][currentX]) * 2;
+        if (counter++ % 4 == 0) {
+            result[index++] = tempValue;
+        }
+        tempValue <<= 2;
+        toggle ^= 1;
+    }
+
+    toggle ^= 1;
+    currentX -= 2;
+
+
+    while (currentY-- > 11) {
+        tempValue |= !toggle ^ q[currentY][currentX - 1] | (toggle ^ q[currentY][currentX]) * 2;
+        if (counter++ % 4 == 0) {
+            result[index++] = tempValue;
+        }
+        tempValue <<= 2;
+        toggle ^= 1;
+    }
+
+    result[1 + result[0]] = 0;
+    return result + 1;         
+}
