@@ -1,0 +1,70 @@
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+
+class AESCTR
+{
+    public static byte[] EncryptCTR(byte[] plainText, byte[] key, byte[] nonce)
+    {
+        using (Aes aes = Aes.Create())
+        {
+            aes.Mode = CipherMode.ECB;
+            aes.Padding = PaddingMode.None;
+
+            ICryptoTransform encryptor = aes.CreateEncryptor(key, null);
+
+            byte[] counter = new byte[16];
+            Array.Copy(nonce, counter, nonce.Length);
+
+            byte[] encrypted = new byte[plainText.Length];
+
+            for (int i = 0; i < plainText.Length; i += 16)
+            {
+                byte[] encryptedCounter = new byte[16];
+                encryptor.TransformBlock(counter, 0, counter.Length, encryptedCounter, 0);
+
+                for (int j = 0; j < 16 && i + j < plainText.Length; j++)
+                {
+                    encrypted[i + j] = (byte)(plainText[i + j] ^ encryptedCounter[j]);
+                }
+
+                IncrementCounter(counter);
+            }
+
+            return encrypted;
+        }
+    }
+
+    public static byte[] DecryptCTR(byte[] cipherText, byte[] key, byte[] nonce)
+    {
+        return EncryptCTR(cipherText, key, nonce);
+    }
+
+    private static void IncrementCounter(byte[] counter)
+    {
+        for (int i = counter.Length - 1; i >= 0; i--)
+        {
+            if (++counter[i] != 0)
+            {
+                break;
+            }
+        }
+    }
+
+    static void Main(string[] args)
+    {
+        Console.WriteLine("Enter the text to encrypt:");
+        string inputText = Console.ReadLine();
+
+        byte[] key = Encoding.UTF8.GetBytes("12345678901234567890123456789012");
+        byte[] nonce = Encoding.UTF8.GetBytes("12345678"); 
+        byte[] plainText = Encoding.UTF8.GetBytes(inputText);
+
+        byte[] encrypted = EncryptCTR(plainText, key, nonce);
+        Console.WriteLine("Encrypted: " + Convert.ToBase64String(encrypted));
+
+        byte[] decrypted = DecryptCTR(encrypted, key, nonce);
+        Console.WriteLine("Decrypted: " + Encoding.UTF8.GetString(decrypted));
+    }
+}
